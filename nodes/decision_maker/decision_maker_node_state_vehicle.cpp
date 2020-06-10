@@ -25,30 +25,20 @@ void DecisionMakerNode::updateInitState(cstring_t& state_name, int status)
 
 void DecisionMakerNode::entrySensorInitState(cstring_t& state_name, int status)
 {
-  Subs["filtered_points"] = nh_.subscribe("/merged/points_no_ground", 1, &DecisionMakerNode::callbackFromFilteredPoints, this);
-  publishOperatorHelpMessage("Please publish \"/merged/points_no_ground\"");
+  Subs["filtered_points"] = nh_.subscribe("/merged/velodyne_points", 1, &DecisionMakerNode::callbackFromFilteredPoints, this);
+  publishOperatorHelpMessage("Please run \"velodyne package\"");
 }
 
 void DecisionMakerNode::updateSensorInitState(cstring_t& state_name, int status)
 {
   const double timeout = 1;
-
-  if (sim_mode_)
-  {
-    ROS_INFO("DecisionMaker is in simulation mode");
-    tryNextState("sensor_is_ready");
-    return;
-  }
-  else if (isEventFlagTrue("received_pointcloud_for_NDT"))
-  {
-    tryNextState("sensor_is_ready");
-  }
+  tryNextState("sensor_is_ready");
   ROS_INFO("DecisionMaker is waiting filtered_point for NDT");
 }
 
 void DecisionMakerNode::entryLocalizationInitState(cstring_t& state_name, int status)
 {
-  Subs["current_pose"] = nh_.subscribe("current_pose", 5, &DecisionMakerNode::callbackFromCurrentPose, this);
+  Subs["current_pose"] = nh_.subscribe("/Odometry/ekf_estimated", 5, &DecisionMakerNode::callbackFromCurrentPose, this);
   publishOperatorHelpMessage("Please start localization in stopped.");
 }
 

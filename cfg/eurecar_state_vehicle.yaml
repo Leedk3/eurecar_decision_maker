@@ -1,5 +1,5 @@
 ---
-autoware_states_vehicle:
+eurecar_states_vehicle:
   -
     StateName: Start
     Transition:

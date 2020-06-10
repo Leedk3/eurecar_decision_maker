@@ -1,9 +1,7 @@
 <?xml version="1.0"?>
 <launch>
-  <arg name="state_vehicle_file_name" default="autoware_state_vehicle.yaml" />
-  <arg name="state_mission_file_name" default="autoware_state_mission.yaml" />
-  <arg name="state_behavior_file_name" default="autoware_state_behavior.yaml" />
-  <arg name="state_motion_file_name" default="autoware_state_motion.yaml" />
+  <arg name="state_vehicle_file_name" default="eurecar_state_vehicle.yaml" />
+  <arg name="state_behavior_file_name" default="eurecar_state_behavior.yaml" />
   <arg name="auto_mission_reload" default="false" />
   <arg name="auto_engage" default="false" />
   <arg name="auto_mission_change" default="false" />
@@ -21,11 +19,9 @@
   <arg name="stop_sign_id" default="stop_sign" />
   <arg name="insert_stop_line_wp" default="true" />
 
-  <node pkg="decision_maker" type="decision_maker_node" name="decision_maker" output="screen">
-    <param name="state_vehicle_file_name" value="$(find decision_maker)/$(arg state_vehicle_file_name)" />
-    <param name="state_mission_file_name" value="$(find decision_maker)/$(arg state_mission_file_name)" />
-    <param name="state_behavior_file_name" value="$(find decision_maker)/$(arg state_behavior_file_name)" />
-    <param name="state_motion_file_name" value="$(find decision_maker)/$(arg state_motion_file_name)" />
+  <node pkg="eurecar_decision_maker" type="eurecar_decision_maker_node" name="eurecar_decision_maker_maker" output="screen">
+    <param name="state_vehicle_file_name" value="$(find eurecar_decision_maker)/cfg/$(arg state_vehicle_file_name)" />
+    <param name="state_behavior_file_name" value="$(find eurecar_decision_maker)/cfg/$(arg state_behavior_file_name)" />
     <param name="auto_mission_reload" value="$(arg auto_mission_reload)" />
     <param name="auto_engage" value="$(arg auto_engage)" />
     <param name="auto_mission_change" value="$(arg auto_mission_change)" />

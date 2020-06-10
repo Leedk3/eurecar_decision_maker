@@ -462,9 +462,9 @@ void DecisionMakerNode::callbackFromClosestWaypoint(const std_msgs::Int32& msg)
   current_status_.closest_waypoint = msg.data;
 }
 
-void DecisionMakerNode::callbackFromCurrentPose(const geometry_msgs::PoseStamped& msg)
+void DecisionMakerNode::callbackFromCurrentPose(const nav_msgs::Odometry& msg)
 {
-  current_status_.pose = msg.pose;
+  current_status_.pose = msg.pose.pose;
 }
 
 void DecisionMakerNode::callbackFromCurrentVelocity(const geometry_msgs::TwistStamped& msg)
@@ -513,5 +513,6 @@ void DecisionMakerNode::callbackFromLanelet2Map(const autoware_lanelet2_msgs::Ma
   routing_graph_ = lanelet::routing::RoutingGraph::build(*lanelet_map_, *traffic_rules);
   setEventFlag("lanelet2_map_loaded", true);
 }
+
 
 }  // namespace decision_maker

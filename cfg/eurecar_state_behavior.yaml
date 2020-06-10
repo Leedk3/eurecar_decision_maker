@@ -1,0 +1,38 @@
+---
+eurecar_states_behavior:
+  -
+    StateName: Start
+    Transition:
+      -
+        Key: started
+        Target: GlobalPathInit
+    Parent: ~
+  -
+    StateName: GlobalPathInit
+    Transition:
+      -
+        Key: init_path
+        Target: CostMapBasedPlanning
+    Parent: ~
+  -
+    StateName: CostMapBasedPlanning
+    Transition:
+      -
+        Key: all_path_blocked
+        Target: Deceleration
+    Parent: ObstacleAvoidance
+  -
+    StateName: Deceleration
+    Transition:
+      -
+        Key: replan_avoiding_path
+        Target: HybridAstar
+    Parent: ObstacleAvoidance
+  -
+    StateName: HybridAstar
+    Transition:
+      -
+        Key: restart_nudge_mode
+        Target: CostMapBasedPlanning
+    Parent: ObstacleAvoidance
+  

@@ -44,6 +44,7 @@ add_executable(
   nodes/decision_maker/decision_maker_node_init.cpp
   nodes/decision_maker/decision_maker_node_callback.cpp
   nodes/decision_maker/decision_maker_node_state_vehicle.cpp
+  nodes/decision_maker/decision_maker_node_state_behavior.cpp
   nodes/decision_maker/decision_maker_node_publish.cpp
   nodes/decision_maker/cross_road_area.cpp
 )
@@ -59,7 +60,8 @@ add_dependencies(
 )
 
 install(
-  TARGETS ${PROJECT_NAME}_node
+  TARGETS 
+      ${PROJECT_NAME}_node
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
@@ -73,6 +75,7 @@ install(
 install(
   FILES
   cfg/eurecar_state_vehicle.yaml
+  cfg/eurecar_state_behavior.yaml
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 )
 

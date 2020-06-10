@@ -15,6 +15,7 @@
 #include <geometry_msgs/Point.h>
 #include <geometry_msgs/PoseStamped.h>
 #include <geometry_msgs/TwistStamped.h>
+#include <nav_msgs/Odometry.h>
 #include <jsk_recognition_msgs/BoundingBoxArray.h>
 #include <jsk_recognition_msgs/BoundingBoxArray.h>
 #include <jsk_rviz_plugins/OverlayText.h>
@@ -248,10 +249,24 @@ private:
   void updateVehicleEmergencyState(cstring_t& state_name, int status);
   // exit callback
 
+  /*** state behavior ***/
+  // entry callback
+  void entryGlobalPathInitState(cstring_t& state_name, int status);
+  void entryCostMapBasedPlanningState(cstring_t& state_name, int status);
+  void entryDecelerationState(cstring_t& state_name, int status);
+  void entryHybridAstarState(cstring_t& state_name, int status);
+  // update callback
+  void updateGlobalPathInitState(cstring_t& state_name, int status);
+  void updateCostMapBasedPlanningState(cstring_t& state_name, int status);
+  void updateDecelerationState(cstring_t& state_name, int status);
+  void updateHybridAstarState(cstring_t& state_name, int status);
+  // exit callback
+
+
   // callback by topic subscribing
   void callbackFromFilteredPoints(const sensor_msgs::PointCloud2::ConstPtr& msg);
   void callbackFromCurrentVelocity(const geometry_msgs::TwistStamped& msg);
-  void callbackFromCurrentPose(const geometry_msgs::PoseStamped& msg);
+  void callbackFromCurrentPose(const nav_msgs::Odometry& msg);
   void callbackFromClosestWaypoint(const std_msgs::Int32& msg);
   void callbackFromLightColor(const ros::MessageEvent<autoware_msgs::TrafficLight const>& event);
   void callbackFromLaneChangeFlag(const std_msgs::Int32& msg);
@@ -282,9 +297,7 @@ private:
 
 public:
   state_machine::StateContext* ctx_vehicle;
-  state_machine::StateContext* ctx_mission;
   state_machine::StateContext* ctx_behavior;
-  state_machine::StateContext* ctx_motion;
   VectorMap g_vmap;
 
   DecisionMakerNode(int argc, char** argv)
@@ -305,14 +318,10 @@ public:
     , sim_mode_(false)
     , use_lanelet_map_(false)
   {
-    std::string file_name_mission;
     std::string file_name_vehicle;
     std::string file_name_behavior;
-    std::string file_name_motion;
     private_nh_.getParam("state_vehicle_file_name", file_name_vehicle);
-    private_nh_.getParam("state_mission_file_name", file_name_mission);
     private_nh_.getParam("state_behavior_file_name", file_name_behavior);
-    private_nh_.getParam("state_motion_file_name", file_name_motion);
     private_nh_.getParam("auto_mission_reload", auto_mission_reload_);
     private_nh_.getParam("auto_engage", auto_engage_);
     private_nh_.getParam("auto_mission_change", auto_mission_change_);
@@ -332,10 +341,9 @@ public:
 
     current_status_.prev_stopped_wpidx = -1;
 
-    ctx_vehicle = new state_machine::StateContext(file_name_vehicle, "autoware_states_vehicle");
-    // ctx_mission = new state_machine::StateContext(file_name_mission, "autoware_states_mission");
-    // ctx_behavior = new state_machine::StateContext(file_name_behavior, "autoware_states_behavior");
-    // ctx_motion = new state_machine::StateContext(file_name_motion, "autoware_states_motion");
+    ctx_vehicle = new state_machine::StateContext(file_name_vehicle, "eurecar_states_vehicle");
+    ctx_behavior = new state_machine::StateContext(file_name_behavior, "eurecar_states_behavior");
+
     init();
     setupStateCallback();
   }

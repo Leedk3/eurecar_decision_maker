@@ -26,13 +26,15 @@ namespace decision_maker
 void DecisionMakerNode::tryNextState(cstring_t& key)
 {
   ctx_vehicle->nextState(key);
+  ctx_behavior->nextState(key);
 }
 
 void DecisionMakerNode::update(void)
 {
   update_msgs();
-  if (ctx_vehicle)
+  if (ctx_vehicle && ctx_behavior)
     ctx_vehicle->onUpdate();
+    ctx_behavior->onUpdate();
 }
 
 void DecisionMakerNode::run(void)
