@@ -33,8 +33,10 @@ void DecisionMakerNode::update(void)
 {
   update_msgs();
   if (ctx_vehicle && ctx_behavior)
+  {
     ctx_vehicle->onUpdate();
     ctx_behavior->onUpdate();
+  }
 }
 
 void DecisionMakerNode::run(void)

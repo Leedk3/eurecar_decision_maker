@@ -140,16 +140,5 @@ bool DecisionMakerNode::isLocalizationConvergence(const geometry_msgs::Point& _c
   prev_point = _current_point;
   return ret;
 }
-bool DecisionMakerNode::isArrivedGoal() const
-{
-  const auto goal_point = current_status_.finalwaypoints.waypoints.back().pose.pose.position;
 
-  if (amathutils::find_distance(goal_point, current_status_.pose.position) < goal_threshold_dist_
-      && fabs(current_status_.velocity) <= goal_threshold_vel_)
-  {
-    return true;
-  }
-
-  return false;
-}
 }

@@ -4,11 +4,7 @@ namespace decision_maker
 {
 void DecisionMakerNode::entryInitState(cstring_t& state_name, int status)
 {
-  ROS_INFO("Hello Autoware World");
-
-  ROS_INFO("ROS is ready");
-
-  tryNextState("init_start");
+  ROS_INFO("Vehicle: State machine for vehicle system.");
 }
 
 void DecisionMakerNode::updateInitState(cstring_t& state_name, int status)
@@ -19,59 +15,76 @@ void DecisionMakerNode::updateInitState(cstring_t& state_name, int status)
   {
     return;
   }
-  ROS_INFO("Autoware is initializing now");
+  ROS_INFO("Vehicle: Eurecar is initializing now");
+  tryNextState("init_start");
   is_first_callback = false;
 }
 
 void DecisionMakerNode::entrySensorInitState(cstring_t& state_name, int status)
 {
-  Subs["filtered_points"] = nh_.subscribe("/merged/velodyne_points", 1, &DecisionMakerNode::callbackFromFilteredPoints, this);
-  publishOperatorHelpMessage("Please run \"velodyne package\"");
+  ROS_INFO("Vehicle: Sensor init start");
+  Subs["lidar"] = nh_.subscribe("/merged/velodyne_points", 1, &DecisionMakerNode::callbackFromVelodyne, this);
 }
 
 void DecisionMakerNode::updateSensorInitState(cstring_t& state_name, int status)
 {
-  const double timeout = 1;
-  tryNextState("sensor_is_ready");
-  ROS_INFO("DecisionMaker is waiting filtered_point for NDT");
+  if(isEventFlagTrue("Velodyne"))
+  {
+    publishOperatorHelpMessage(".");
+    tryNextState("sensor_is_ready");
+  }
+  else{
+    publishOperatorHelpMessage("Please run \"velodyne package\"");
+  }  
+
 }
 
 void DecisionMakerNode::entryLocalizationInitState(cstring_t& state_name, int status)
 {
-  Subs["current_pose"] = nh_.subscribe("/Odometry/ekf_estimated", 5, &DecisionMakerNode::callbackFromCurrentPose, this);
-  publishOperatorHelpMessage("Please start localization in stopped.");
+  ROS_INFO("Vehicle: Localization init start");
+  Subs["odometry"] = nh_.subscribe("/Odometry/ekf_estimated", 5, &DecisionMakerNode::callbackFromCurrentPose, this);
 }
 
 void DecisionMakerNode::updateLocalizationInitState(cstring_t& state_name, int status)
 {
   if (isLocalizationConvergence(current_status_.pose.position))
   {
+    publishOperatorHelpMessage(".");
     tryNextState("localization_is_ready");
+  }
+  else{
+    publishOperatorHelpMessage("Please check \"ekf estimation package\"");
   }
 }
 
 void DecisionMakerNode::entryPlanningInitState(cstring_t& state_name, int status)
 {
+  ROS_INFO("Vehicle: Current index init start");
+  publishOperatorHelpMessage(".");
   Subs["closest_waypoint"] =
       nh_.subscribe("closest_waypoint", 1, &DecisionMakerNode::callbackFromClosestWaypoint, this);
 }
 
 void DecisionMakerNode::updatePlanningInitState(cstring_t& state_name, int status)
 {
-  tryNextState("planning_is_ready");
+  if (isEventFlagTrue("received_closest_waypoint"))
+  {
+    publishOperatorHelpMessage(".");
+    tryNextState("planning_is_ready");
+  }
+  else{
+    publishOperatorHelpMessage("Cannot calculate closest waypoint");
+  }
 }
 
 void DecisionMakerNode::entryVehicleInitState(cstring_t& state_name, int status)
 {
-  publishOperatorHelpMessage("Please prepare vehicle for depature.");
+  publishOperatorHelpMessage("All systems is working well");
 }
 
 void DecisionMakerNode::updateVehicleInitState(cstring_t& state_name, int status)
 {
-  if (true /*isEventFlagTrue("received_vehicle_status")*/)
-  {
-    tryNextState("vehicle_is_ready");
-  }
+  tryNextState("vehicle_is_ready");
 }
 
 void DecisionMakerNode::entryVehicleReadyState(cstring_t& state_name, int status)

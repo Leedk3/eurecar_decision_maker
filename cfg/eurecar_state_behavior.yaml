@@ -25,14 +25,17 @@ eurecar_states_behavior:
     StateName: Deceleration
     Transition:
       -
-        Key: replan_avoiding_path
+        Key: hybrid_planning_mode
         Target: HybridAstar
+      -
+        Key: keep_going_mode
+        Target: CostMapBasedPlanning
     Parent: ObstacleAvoidance
   -
     StateName: HybridAstar
     Transition:
       -
-        Key: restart_nudge_mode
+        Key: costmap_relaying_mode
         Target: CostMapBasedPlanning
     Parent: ObstacleAvoidance
   

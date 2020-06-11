@@ -60,7 +60,7 @@ jsk_rviz_plugins::OverlayText createOverlayText(cstring_t& data, const int colum
 void DecisionMakerNode::publishOperatorHelpMessage(const cstring_t& message)
 {
   static std::vector<std::string> msg_log;
-  static const size_t log_size = 10;
+  static const size_t log_size = 4;
 
   msg_log.push_back(message);
 
@@ -79,23 +79,22 @@ void DecisionMakerNode::publishOperatorHelpMessage(const cstring_t& message)
 
 void DecisionMakerNode::update_msgs(void)
 {
-  if (ctx_vehicle )
+  if (ctx_vehicle && ctx_behavior )
   {
-    std::cout << "hello_update : " << ctx_vehicle->getStateText() << std::endl;
+    // std::cout << "hello_update : " << ctx_vehicle->getStateText() << ", " << ctx_behavior->getStateText() << std::endl;
     static std::string text_vehicle_state, text_mission_state, text_behavior_state, text_motion_state;
     text_vehicle_state = ctx_vehicle->getStateText();
-
-    static std_msgs::String state_msg;
-    state_msg.data = text_vehicle_state; 
-    Pubs["state"].publish(state_msg);
+    text_behavior_state = ctx_behavior->getStateText();
 
     static std::string overlay_text;
-    overlay_text = "> Vehicle:\n" + text_vehicle_state ;
+    overlay_text = "> Vehicle:\n" + text_vehicle_state + 
+                   "\n> Behavior:\n" + text_behavior_state;
     Pubs["state_overlay"].publish(createOverlayText(overlay_text, 1));
 
     static autoware_msgs::State state_array_msg;
     state_array_msg.header.stamp = ros::Time::now();
     state_array_msg.vehicle_state = text_vehicle_state;
+    state_array_msg.behavior_state = text_behavior_state;
     Pubs["state_msg"].publish(state_array_msg);
 
     static std_msgs::String transition_msg;
@@ -108,12 +107,6 @@ void DecisionMakerNode::update_msgs(void)
   }
 }
 
-void DecisionMakerNode::publishLightColor(const int status)
-{
-  autoware_msgs::TrafficLight msg;
-  msg.traffic_light = status;
-  Pubs["light_color"].publish(msg);
-}
 
 void DecisionMakerNode::publishStoplineWaypointIdx(const int wp_idx)
 {
