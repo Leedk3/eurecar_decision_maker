@@ -48,7 +48,6 @@ void DecisionMakerNode::callbackFromLaneWaypoint(const autoware_msgs::LaneArray&
 void DecisionMakerNode::callbackFromAllPathBlocked(const std_msgs::Bool& msg)
 {
   bAllPathBlocked = msg.data;
-  std::cout << "bAllPathBlocked" <<bAllPathBlocked << std::endl;
 }
 
 void DecisionMakerNode::callbackFromClosestWaypoint(const std_msgs::Int32& msg)
