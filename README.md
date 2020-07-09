@@ -7,7 +7,7 @@ We adopted autoware package based state machine to make up of Eurecar decision m
 
 ## State Description
 ### Vehicle States
-<img src="docs/Eurecar_state_vehicle.png" width=300>
+<img src="docs/Eurecar_state_vehicle.png" width=600>
 State name|Required topic|Description|Implementation
 --|--|---|--
 Init|-|The parent state of the following states.|-
@@ -18,7 +18,7 @@ VehicleInit|-|Waits until vehicle is ready for departure.|No implementation goes
 VehicleReady|-|Vehicle is ready to move.|-
 
 ### Behavior States
-<img src="docs/Eurecar_state_behavior.png" width=300>
+<img src="docs/Eurecar_state_behavior.png" width=600>
 State name|Required topic|Description|Implementation
 --|--|---|--
 Init|-|The parent state of the following states.|-
