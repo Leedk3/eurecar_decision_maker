@@ -1,27 +1,34 @@
-# Decision Maker
+# Eurecar Decision Maker
 
 ## Overview
 **This feature is experimental.**</br>
 Autoware package based state machine.
-<!-- Autoware package that visualize internal state and publish some commands. -->
-### Vehicle
-<img src="docs/VehicleStates.jpg" width=300>
+We adopted autoware package based state machine to make up of Eurecar decision maker node 
 
-## Runtime Manager Parameters
-Parameter|Type|Description
---|---|--
-auto_mission_reload|Bool|(default: *false*)<br>If this is set true, decision maker automatically reloads mission as new mission after previous mission is completed.
-auto_engage|Bool|(default: *false*)<br>If this is set true, decision maker automatically engage immediately after ready to drive.
-auto_mission_change|Bool|(default: *false*)<br>If this is set true, decision maker automatically change the mission(waypoint) without state_cmd when new mission is loaded while driving.
-use_fms|Bool|(default: *false*)<br>This must be true in order to incoorporate with [Autoware Management System](https://github.com/CPFL/AMS)
-disuse_vector_map|Bool|(default: *false*)<br> If set *true*, decision_maker will bypass loading a vector map on startup.
-num_of_steer_behind|Int|(default: *20*)<br> lookup distance along waypoints to determine steering state(straight, turning right, or turning left)
-change_threshold_dist|Double|(default: *1*)<br> This is relevent only if *use_fms* is *true*.<br> If the distance from vehicle to closest waypoint in the new mission is further than *change_threshold_dist* [m], mission change fails.
-change_threshold_angle|Double|(default:*15*)<br>This is relevent only if *use_fms* is *true*.<br> If the angle from vehicle to closest waypoint in the new mission is further than this *change_threshold_dist* [deg], mission change fails.
-time_to_avoidance|Double|(default: *3*)<br> If the vehicle is stuck for *time_to_avoidance* seconds (e.g. due to obstacles), the state transits to from "Go" to "Avoidance".
-goal_threshold_dist|Double|(default: *3*)<br> Threshold used to check if vehicle has reached to the goal (i.e. end of waypoints). The vehicle must be less than *goal_threshold_dist* [m] to the goal.
-goal_threshold_vel|Double|(default: *0.1*)<br> Threshold used to check if vehicle has reached to the goal (i.e. end of waypoints). The vehicle must be less than *goal_threshold_vel* [m/s] to be treated as goal arrival.
+## State Description
+### Vehicle States
+<img src="docs/Eurecar_state_vehicle.png" width=300>
+State name|Required topic|Description|Implementation
+--|--|---|--
+Init|-|The parent state of the following states.|-
+SensorInit|/merged/velodyne_points|Waits until all sensors are ready.|Waits until /merged/velodyne_points is received.  
+LocalizationInit|/Odometry/ekf_estimated|Waits until localizer is ready | Waits until current_pose is converged.
+PlanningInit|/closest_waypoint|Waits unil planners are ready | Subscriber is set for /closest_waypoint.
+VehicleInit|-|Waits until vehicle is ready for departure.|No implementation goes directly to vehilce ready state.
+VehicleReady|-|Vehicle is ready to move.|-
 
+### Behavior States
+<img src="docs/Eurecar_state_behavior.png" width=300>
+State name|Required topic|Description|Implementation
+--|--|---|--
+Init|-|The parent state of the following states.|-
+GlobalPathInit|/based/lane_waypoints_raw|Waits until all path are ready.|Waits until waypoint is received.  
+CostMapBasedPlanning|-|Base state in the motion planner| Graph based lattice planner using occupancy grid map.
+Deceleration|/all_path_blocked|Decelerate before finding the collision path| Decelerate until vehicle speed is slower than safety speed.
+HybridAstar|/all_path_blocked|Find a collision free path using hybrid A star|Find the collision free path and check costmap based planner is feasible. If it is feasible, relay costmap based planner
+
+
+<!-- 
 ## ROS Parameters
 Parameter|Type|Description
 --|---|--
@@ -29,9 +36,9 @@ state_vehicle_file_name|string|file that defines vehicle state transition
 state_mission_file_name|string|file that defines mission state transition
 state_behavior_file_name|string|file that defines behavior state transition
 state_motion_file_name|string|file that defines motion state transition
-stopline_reset_count|int|This parameter is used if the vehicle stops at the stop line and moves backward without crossing the stop line. When the vehicle moves backward by this count of the waypoints, the stop line is recognized again.
+stopline_reset_count|int|This parameter is used if the vehicle stops at the stop line and moves backward without crossing the stop line. When the vehicle moves backward by this count of the waypoints, the stop line is recognized again. -->
 
-
+<!-- 
 ## Subscribed topics
 Topic|Type|Objective
 --|---|--
@@ -68,19 +75,7 @@ Topic|Type|Objective
 /decision_maker/state_overlay|jsk_rviz_plugins/OverlayText|Current state as overlay_txt.
 /state/stopline_wpidx|std_msgs/Int32|Index of waypoint for the vehicle to stop.
 /decision_maker/target_velocity_array|std_msgs/Float64MultiArray| Array of target velocity obtained from final_waypoints.
-/stop_location|autoware_msgs/VehicleLocation|Feedback to fms on the `/state_stop_order_wpidx` topic. It contains the index that the vehicle will stop and the id of the lane_array that the vehicle is using at the time.
+/stop_location|autoware_msgs/VehicleLocation|Feedback to fms on the `/state_stop_order_wpidx` topic. It contains the index that the vehicle will stop and the id of the lane_array that the vehicle is using at the time. -->
 
 
-## State Description
-### Vehicle States
-State name|Required topic|Description|Implementation
---|--|---|--
-Init|-|The parent state of the following states.|-
-SensorInit|/filtered_points|Waits until all sensors are ready.|Waits until /filtered_points is received unless wf_simulator node is launched.  
-LocalizationInit|/current_pose|Waits until localizer is ready | Waits until current_pose is converged. (i.e. ndt_matching is stable.)
-PlanningInit|/closest_waypoint|Waits unil planners are ready | Subscriber is set for /closest_waypoint.
-VehicleInit|-|Waits until vehicle is ready for departure.|No implementation goes directly to vehilce ready state.
-VehicleReady|-|Vehicle is ready to move.|Exits to VehicleEmergency when `emergency` key is given by state_cmd from other states, or if `emergency_flag` is set true by other states.
-BatteryCharging|-|Charging the battery|Waits until `charging_end` key by state_cmd from other nodes(e.g. by AMS).
-VehicleEmergency|-|Emergency is detected somewhere in the system. |Waits until `return_from_emergency` or `return_to_ready`  key is by /state_cmd (e.g. by DecisionMakerPanel)
 

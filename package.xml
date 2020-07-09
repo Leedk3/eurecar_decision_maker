@@ -4,6 +4,8 @@
   <version>1.12.0</version>
   <description>The eurecar_decision maker package</description>
   <maintainer email="lee.dk@kaist.ac.kr">Daegyu Lee</maintainer>
+  <author email="yusuke.fujii@tier4.jp">Yusuke Fujii</author>
+  <author email="azumi.suzuki@tier4.jp">Yusuke Fujii</author>
   <author email="lee.dk@kaist.ac.kr">Daegyu Lee</author>
   <license>Apache 2</license>
 
